@@ -1,7 +1,54 @@
+# name: Build and Push to ACR
+
+# on:
+#   workflow_dispatch:  # Isse tum manually GitHub se trigger kar sakte ho
+
+# permissions:
+#   id-token: write
+#   contents: read
+  
+# jobs:
+#   build-and-push:
+#     runs-on: self-hosted
+
+#     env:
+#       IMAGE_NAME: todo-ui
+#       IMAGE_TAG: v4
+#       ACR_NAME: g2acrdevtodoapp01
+#       ACR_LOGIN_SERVER: g2acrdevtodoapp01.azurecr.io
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Azure Login
+#         uses: Azure/login@v2.3.0
+#         with:
+#           creds: ${{ secrets.AZURE_CRED }}
+
+#       - name: Log in to ACR
+#         run: |
+#           az acr login --name $ACR_NAME
+#           az acr login --name $env:ACR_NAME
+
+
+#       - name: Build Docker Image
+#         run: |
+#           docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+#       - name: Tag Docker Image for ACR
+#         run: |
+#           docker tag $IMAGE_NAME:$IMAGE_TAG $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG
+
+#       - name: Push Docker Image to ACR
+#         run: |
+#           docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG
+
+
 name: Build and Push to ACR
 
 on:
-  workflow_dispatch:  # Isse tum manually GitHub se trigger kar sakte ho
+  workflow_dispatch:  # Manually trigger from GitHub
 
 permissions:
   id-token: write
@@ -27,17 +74,24 @@ jobs:
           creds: ${{ secrets.AZURE_CRED }}
 
       - name: Log in to ACR
+        shell: pwsh
         run: |
-          az acr login --name $ACR_NAME
+          az acr login --name $env:ACR_NAME
 
       - name: Build Docker Image
+        shell: pwsh
         run: |
-          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          docker build -t $env:IMAGE_NAME:$env:IMAGE_TAG .
 
       - name: Tag Docker Image for ACR
+        shell: pwsh
         run: |
-          docker tag $IMAGE_NAME:$IMAGE_TAG $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG
+          docker tag $env:IMAGE_NAME:$env:IMAGE_TAG $env:ACR_LOGIN_SERVER/$env:IMAGE_NAME:$env:IMAGE_TAG
 
       - name: Push Docker Image to ACR
+        shell: pwsh
         run: |
-          docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG
+          docker push $env:ACR_LOGIN_SERVER/$env:IMAGE_NAME:$env:IMAGE_TAG
+
+
+
